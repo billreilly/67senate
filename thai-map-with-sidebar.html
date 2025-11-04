@@ -1,0 +1,4845 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Senate 67 — แผนที่อำเภอ + คำอธิบาย</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    html, body { height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans Thai', Arial, sans-serif; }
+    .app { display:flex; height:100vh; width:100vw; }
+    .map-wrap { flex: 1 1 64%; min-width: 300px; position: relative; background:#fff; }
+    #map { position:absolute; inset:0; }
+    .panel { flex: 0 0 36%; max-width: 36%; padding: 18px 20px; overflow:auto; border-left: 1px solid #eee; }
+    .panel h1 { font-size: 22px; margin: 0 0 8px; }
+    .panel h2 { font-size: 16px; margin: 18px 0 6px; }
+    .panel p { margin: 8px 0; line-height: 1.5; }
+    .stat { display:flex; gap:10px; margin:10px 0; flex-wrap:wrap; }
+    .pill { background:#f5f5f7; border:1px solid #e3e3e8; padding:6px 10px; border-radius:999px; font-size:12px; }
+    .foot { color:#666; font-size:12px; margin-top:18px; }
+    .info { position:absolute; top:10px; right:10px; z-index: 500; padding:8px 12px; background:#fff; border-radius:8px; box-shadow:0 0 15px rgba(0,0,0,0.12); font-size:14px; }
+    .legend { position:absolute; bottom:10px; right:10px; z-index: 500; background:#fff; border-radius:8px; box-shadow:0 0 15px rgba(0,0,0,0.12); padding:8px 10px; font-size:12px; }
+    .legend .row { display:flex; align-items:center; gap:8px; margin:3px 0; }
+    .swatch { width:14px; height:14px; border:1px solid #999; }
+    @media (max-width: 960px) {
+      .app { flex-direction: column; }
+      .panel { max-width: 100%; flex-basis: 42%; }
+      .map-wrap { flex-basis: 58%; }
+      .info { top: 8px; right: 8px; }
+      .legend { bottom: 8px; right: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div id="info" class="info">ไทย: แผนที่อำเภอ<br/>เลื่อนเมาส์เพื่อดูค่า (TOTAL)</div>
+    <div id="legend" class="legend"></div>
+  </div>
+  <aside class="panel">
+    <h1>Senate 67 — ภาพรวม</h1>
+    <p>แผนที่นี้แสดงผลรวมค่า <b>TOTAL</b> ระดับอำเภอทั่วประเทศ เพื่อช่วยอธิบายพื้นที่ที่เกี่ยวข้องกับ <b>Senate 67</b> และการทำงานภาคสนามของโครงการ <i>senate67</i>.</p>
+    <h2>วิธีอ่าน</h2>
+    <p>สีเข้มหมายถึงค่าสูงกว่า สีอ่อนหมายถึงค่าต่ำกว่า คลิกที่อำเภอเพื่อดูรายละเอียด พร้อมชื่อจังหวัดและค่า TOTAL ของพื้นที่นั้น</p>
+    <div class="stat">
+      <div class="pill">ระดับข้อมูล: อำเภอ</div>
+      <div class="pill">การรวมผล: ผลรวมทุกคอลัมน์ตัวเลข</div>
+      <div class="pill">โฟกัส: ไทยเท่านั้น</div>
+    </div>
+    <h2>สิ่งที่น่าสังเกต</h2>
+    <ul>
+      <li>กระจุกตัวของค่าสูงในกลุ่มอำเภอหลักของแต่ละจังหวัด</li>
+      <li>เส้นแนวชายแดนและอำเภอห่างไกลมักมีค่าน้อยกว่า</li>
+      <li>กรุงเทพฯ ใช้เขตแทนอำเภอ</li>
+    </ul>
+    <h2>ข้อจำกัด</h2>
+    <p>ชุดข้อมูลนี้รวมตัวเลขทั้งหมดเป็น TOTAL โดยตรง หากต้องการแยกมิติ เช่น กลุ่มย่อย 1–20 หรืออัตราต่อประชากร บอกฉันได้ ฉันจะเพิ่มตัวเลือกสลับตัวชี้วัด</p>
+    <div class="foot">ขอบเขตอำเภอ: districts.geojson | เครื่องมือแผนที่: Leaflet</div>
+  </aside>
+</div>
+
+<script>
+window.DATA = [
+  {
+    "province": "มุกดาหาร",
+    "district": "เมืองมุกดาหาร",
+    "value": 269.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "คำชะอี",
+    "value": 266.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "ดงหลวง",
+    "value": 150.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "ดอนตาล",
+    "value": 233.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "นิคมคำสร้อย",
+    "value": 107.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "หนองสูง",
+    "value": 118.0
+  },
+  {
+    "province": "มุกดาหาร",
+    "district": "หว้านใหญ่",
+    "value": 99.0
+  },
+  {
+    "province": "นครนายก",
+    "district": "เมืองนครนายก",
+    "value": 222.0
+  },
+  {
+    "province": "นครนายก",
+    "district": "บ้านนา",
+    "value": 138.0
+  },
+  {
+    "province": "นครนายก",
+    "district": "ปากพลี",
+    "value": 79.0
+  },
+  {
+    "province": "นครนายก",
+    "district": "องครักษ์",
+    "value": 198.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "เมืองอ่างทอง",
+    "value": 107.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "แสวงหา",
+    "value": 81.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "โพธิ์ทอง",
+    "value": 90.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "ไชโย",
+    "value": 81.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "ป่าโมก",
+    "value": 90.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "วิเศษชัยชาญ",
+    "value": 125.0
+  },
+  {
+    "province": "อ่างทอง",
+    "district": "สามโก้",
+    "value": 75.0
+  },
+  {
+    "province": "สตูล",
+    "district": "เมืองสตูล",
+    "value": 160.0
+  },
+  {
+    "province": "สตูล",
+    "district": "ควนโดน",
+    "value": 48.0
+  },
+  {
+    "province": "สตูล",
+    "district": "ควนกาหลง",
+    "value": 99.0
+  },
+  {
+    "province": "สตูล",
+    "district": "ท่าแพ",
+    "value": 95.0
+  },
+  {
+    "province": "สตูล",
+    "district": "ทุ่งหว้า",
+    "value": 117.0
+  },
+  {
+    "province": "สตูล",
+    "district": "มะนัง",
+    "value": 100.0
+  },
+  {
+    "province": "สตูล",
+    "district": "ละงู",
+    "value": 118.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "เขาย้อย",
+    "value": 47.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "เมืองเพชรบุรี",
+    "value": 317.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "แก่งกระจาน",
+    "value": 114.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "ชะอำ",
+    "value": 91.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "ท่ายาง",
+    "value": 155.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "บ้านแหลม",
+    "value": 152.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "บ้านลาด",
+    "value": 88.0
+  },
+  {
+    "province": "เพชรบุรี",
+    "district": "หนองหญ้าปล้อง",
+    "value": 109.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "เมืองอำนาจเจริญ",
+    "value": 207.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "เสนางคนิคม",
+    "value": 101.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "ชานุมาน",
+    "value": 93.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "ปทุมราชวงศา",
+    "value": 87.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "พนา",
+    "value": 155.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "ลืออำนาจ",
+    "value": 76.0
+  },
+  {
+    "province": "อำนาจเจริญ",
+    "district": "หัวตะพาน",
+    "value": 83.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "พระนครศรีอยุธยา",
+    "value": 219.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "เสนา",
+    "value": 123.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "ท่าเรือ",
+    "value": 44.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "นครหลวง",
+    "value": 52.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บางไทร",
+    "value": 116.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บางซ้าย",
+    "value": 71.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บางบาล",
+    "value": 97.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บางปะหัน",
+    "value": 69.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บางปะอิน",
+    "value": 164.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "บ้านแพรก",
+    "value": 29.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "ผักไห่",
+    "value": 86.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "ภาชี",
+    "value": 97.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "มหาราช",
+    "value": 66.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "ลาดบัวหลวง",
+    "value": 109.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "วังน้อย",
+    "value": 147.0
+  },
+  {
+    "province": "พระนครศรีอยุธยา",
+    "district": "อุทัย",
+    "value": 125.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "เบญจลักษ์",
+    "value": 79.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "เมืองจันทร์",
+    "value": 94.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "เมืองศรีสะเกษ",
+    "value": 295.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "โนนคูณ",
+    "value": 88.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "โพธิ์ศรีสุวรรณ",
+    "value": 97.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ไพรบึง",
+    "value": 183.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "กันทรลักษ์",
+    "value": 197.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "กันทรารมย์",
+    "value": 127.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ขุขันธ์",
+    "value": 168.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ขุนหาญ",
+    "value": 67.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "น้ำเกลี้ยง",
+    "value": 142.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "บึงบูรพ์",
+    "value": 36.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ปรางค์กู่",
+    "value": 151.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "พยุห์",
+    "value": 156.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ภูสิงห์",
+    "value": 106.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ยางชุมน้อย",
+    "value": 37.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ราษีไศล",
+    "value": 147.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "วังหิน",
+    "value": 118.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ศรีรัตนะ",
+    "value": 73.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ศิลาลาด",
+    "value": 94.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "ห้วยทับทัน",
+    "value": 46.0
+  },
+  {
+    "province": "ศรีสะเกษ",
+    "district": "อุทุมพรพิสัย",
+    "value": 173.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "เขาชัยสน",
+    "value": 65.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "เมืองพัทลุง",
+    "value": 151.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "กงหรา",
+    "value": 82.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ควนขนุน",
+    "value": 127.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ตะโหมด",
+    "value": 42.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "บางแก้ว",
+    "value": 102.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ปากพะยูน",
+    "value": 67.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ป่าบอน",
+    "value": 85.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ป่าพะยอม",
+    "value": 71.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ศรีนครินทร์",
+    "value": 51.0
+  },
+  {
+    "province": "พัทลุง",
+    "district": "ศรีบรรพต",
+    "value": 68.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "เมืองลำพูน",
+    "value": 154.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "เวียงหนองล่อง",
+    "value": 53.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "แม่ทา",
+    "value": 79.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "ทุ่งหัวช้าง",
+    "value": 73.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "บ้านโฮ่ง",
+    "value": 69.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "บ้านธิ",
+    "value": 41.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "ป่าซาง",
+    "value": 99.0
+  },
+  {
+    "province": "ลำพูน",
+    "district": "ลี้",
+    "value": 53.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "เมืองลพบุรี",
+    "value": 268.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "โคกเจริญ",
+    "value": 84.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "โคกสำโรง",
+    "value": 82.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "ชัยบาดาล",
+    "value": 59.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "ท่าวุ้ง",
+    "value": 181.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "ท่าหลวง",
+    "value": 35.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "บ้านหมี่",
+    "value": 205.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "พัฒนานิคม",
+    "value": 106.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "ลำสนธิ",
+    "value": 17.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "สระโบสถ์",
+    "value": 41.0
+  },
+  {
+    "province": "ลพบุรี",
+    "district": "หนองม่วง",
+    "value": 59.0
+  },
+  {
+    "province": "ระนอง",
+    "district": "เมืองระนอง",
+    "value": 136.0
+  },
+  {
+    "province": "ระนอง",
+    "district": "กระบุรี",
+    "value": 74.0
+  },
+  {
+    "province": "ระนอง",
+    "district": "กะเปอร์",
+    "value": 30.0
+  },
+  {
+    "province": "ระนอง",
+    "district": "ละอุ่น",
+    "value": 28.0
+  },
+  {
+    "province": "ระนอง",
+    "district": "สุขสำราญ",
+    "value": 4.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "เมืองยโสธร",
+    "value": 114.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "เลิงนกทา",
+    "value": 83.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "ไทยเจริญ",
+    "value": 76.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "กุดชุม",
+    "value": 90.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "ค้อวัง",
+    "value": 53.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "คำเขื่อนแก้ว",
+    "value": 94.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "ทรายมูล",
+    "value": 65.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "ป่าติ้ว",
+    "value": 60.0
+  },
+  {
+    "province": "ยโสธร",
+    "district": "มหาชนะชัย",
+    "value": 88.0
+  },
+  {
+    "province": "เลย",
+    "district": "เชียงคาน",
+    "value": 66.0
+  },
+  {
+    "province": "เลย",
+    "district": "เมืองเลย",
+    "value": 85.0
+  },
+  {
+    "province": "เลย",
+    "district": "เอราวัณ",
+    "value": 5.0
+  },
+  {
+    "province": "เลย",
+    "district": "ด่านซ้าย",
+    "value": 62.0
+  },
+  {
+    "province": "เลย",
+    "district": "ท่าลี่",
+    "value": 41.0
+  },
+  {
+    "province": "เลย",
+    "district": "นาแห้ว",
+    "value": 72.0
+  },
+  {
+    "province": "เลย",
+    "district": "นาด้วง",
+    "value": 44.0
+  },
+  {
+    "province": "เลย",
+    "district": "ปากชม",
+    "value": 76.0
+  },
+  {
+    "province": "เลย",
+    "district": "ผาขาว",
+    "value": 68.0
+  },
+  {
+    "province": "เลย",
+    "district": "ภูเรือ",
+    "value": 84.0
+  },
+  {
+    "province": "เลย",
+    "district": "ภูกระดึง",
+    "value": 73.0
+  },
+  {
+    "province": "เลย",
+    "district": "ภูหลวง",
+    "value": 58.0
+  },
+  {
+    "province": "เลย",
+    "district": "วังสะพุง",
+    "value": 115.0
+  },
+  {
+    "province": "เลย",
+    "district": "หนองหิน",
+    "value": 10.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "เมืองราชบุรี",
+    "value": 213.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "โพธาราม",
+    "value": 47.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "จอมบึง",
+    "value": 65.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "ดำเนินสะดวก",
+    "value": 90.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "บางแพ",
+    "value": 89.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "บ้านโป่ง",
+    "value": 169.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "บ้านคา",
+    "value": 70.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "ปากท่อ",
+    "value": 110.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "วัดเพลง",
+    "value": 55.0
+  },
+  {
+    "province": "ราชบุรี",
+    "district": "สวนผึ้ง",
+    "value": 99.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "เมืองปราจีนบุรี",
+    "value": 119.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "กบินทร์บุรี",
+    "value": 93.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "นาดี",
+    "value": 60.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "บ้านสร้าง",
+    "value": 20.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "ประจันตคาม",
+    "value": 92.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "ศรีมโหสถ",
+    "value": 58.0
+  },
+  {
+    "province": "ปราจีนบุรี",
+    "district": "ศรีมหาโพธิ",
+    "value": 130.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "เฉลิมพระเกียรติ",
+    "value": 81.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "เมืองบุรีรัมย์",
+    "value": 189.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "แคนดง",
+    "value": 84.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "โนนดินแดง",
+    "value": 55.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "โนนสุวรรณ",
+    "value": 58.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "กระสัง",
+    "value": 95.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "คูเมือง",
+    "value": 96.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ชำนิ",
+    "value": 67.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "นาโพธิ์",
+    "value": 54.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "นางรอง",
+    "value": 84.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "บ้านใหม่ไชยพจน์",
+    "value": 65.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "บ้านกรวด",
+    "value": 73.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "บ้านด่าน",
+    "value": 50.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ประโคนชัย",
+    "value": 85.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ปะคำ",
+    "value": 74.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "พลับพลาชัย",
+    "value": 57.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "พุทไธสง",
+    "value": 56.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ละหานทราย",
+    "value": 63.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ลำปลายมาศ",
+    "value": 89.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "สตึก",
+    "value": 81.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "หนองกี่",
+    "value": 69.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "หนองหงส์",
+    "value": 80.0
+  },
+  {
+    "province": "บุรีรัมย์",
+    "district": "ห้วยราช",
+    "value": 80.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "เทพา",
+    "value": 167.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "เมืองสงขลา",
+    "value": 137.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "กระแสสินธุ์",
+    "value": 31.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "คลองหอยโข่ง",
+    "value": 23.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "ควนเนียง",
+    "value": 54.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "จะนะ",
+    "value": 190.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "นาทวี",
+    "value": 140.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "นาหม่อม",
+    "value": 15.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "บางกล่ำ",
+    "value": 33.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "ระโนด",
+    "value": 78.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "รัตภูมิ",
+    "value": 55.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "สทิงพระ",
+    "value": 57.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "สะเดา",
+    "value": 109.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "สะบ้าย้อย",
+    "value": 176.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "สิงหนคร",
+    "value": 74.0
+  },
+  {
+    "province": "สงขลา",
+    "district": "หาดใหญ่",
+    "value": 256.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "เฉลิมพระเกียรติ",
+    "value": 71.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "เชียรใหญ่",
+    "value": 86.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "เมืองนครศรีธรรมราช",
+    "value": 102.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ขนอม",
+    "value": 36.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "จุฬาภรณ์",
+    "value": 60.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ฉวาง",
+    "value": 115.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ชะอวด",
+    "value": 158.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ช้างกลาง",
+    "value": 42.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ถ้ำพรรณรา",
+    "value": 55.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ท่าศาลา",
+    "value": 54.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ทุ่งใหญ่",
+    "value": 53.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ทุ่งสง",
+    "value": 142.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "นบพิตำ",
+    "value": 39.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "นาบอน",
+    "value": 32.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "บางขัน",
+    "value": 56.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ปากพนัง",
+    "value": 92.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "พรหมคีรี",
+    "value": 43.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "พระพรหม",
+    "value": 44.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "พิปูน",
+    "value": 78.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ร่อนพิบูลย์",
+    "value": 115.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "ลานสกา",
+    "value": 113.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "สิชล",
+    "value": 62.0
+  },
+  {
+    "province": "นครศรีธรรมราช",
+    "district": "หัวไทร",
+    "value": 51.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "เนินขาม",
+    "value": 39.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "เมืองชัยนาท",
+    "value": 48.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "มโนรมย์",
+    "value": 48.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "วัดสิงห์",
+    "value": 15.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "สรรคบุรี",
+    "value": 65.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "สรรพยา",
+    "value": 37.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "หนองมะโมง",
+    "value": 37.0
+  },
+  {
+    "province": "ชัยนาท",
+    "district": "หันคา",
+    "value": 58.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "เชียงดาว",
+    "value": 61.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "เมืองเชียงใหม่",
+    "value": 344.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "เวียงแหง",
+    "value": 22.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่แจ่ม",
+    "value": 29.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่แตง",
+    "value": 64.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่ริม",
+    "value": 197.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่วาง",
+    "value": 71.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่ออน",
+    "value": 20.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "แม่อาย",
+    "value": 69.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ไชยปราการ",
+    "value": 47.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "กัลยาณิวัฒนา",
+    "value": 29.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "จอมทอง",
+    "value": 97.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ดอยเต่า",
+    "value": 53.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ดอยสะเก็ด",
+    "value": 94.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ดอยหล่อ",
+    "value": 29.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ฝาง",
+    "value": 61.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "พร้าว",
+    "value": 71.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "สะเมิง",
+    "value": 41.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "สันกำแพง",
+    "value": 126.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "สันทราย",
+    "value": 98.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "สันป่าตอง",
+    "value": 42.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "สารภี",
+    "value": 65.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "หางดง",
+    "value": 107.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "อมก๋อย",
+    "value": 28.0
+  },
+  {
+    "province": "เชียงใหม่",
+    "district": "ฮอด",
+    "value": 37.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "เมืองอุทัยธานี",
+    "value": 22.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "ทัพทัน",
+    "value": 35.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "บ้านไร่",
+    "value": 25.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "ลานสัก",
+    "value": 52.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "สว่างอารมณ์",
+    "value": 84.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "หนองขาหย่าง",
+    "value": 27.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "หนองฉาง",
+    "value": 41.0
+  },
+  {
+    "province": "อุทัยธานี",
+    "district": "ห้วยคต",
+    "value": 50.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "เมืองพิจิตร",
+    "value": 100.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "โพทะเล",
+    "value": 48.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "โพธิ์ประทับช้าง",
+    "value": 29.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "ดงเจริญ",
+    "value": 16.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "ตะพานหิน",
+    "value": 50.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "ทับคล้อ",
+    "value": 49.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "บางมูลนาก",
+    "value": 68.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "บึงนาราง",
+    "value": 23.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "วชิรบารมี",
+    "value": 41.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "วังทรายพูน",
+    "value": 24.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "สากเหล็ก",
+    "value": 31.0
+  },
+  {
+    "province": "พิจิตร",
+    "district": "สามง่าม",
+    "value": 33.0
+  },
+  {
+    "province": "สมุทรสาคร",
+    "district": "เมืองสมุทรสาคร",
+    "value": 251.0
+  },
+  {
+    "province": "สมุทรสาคร",
+    "district": "กระทุ่มแบน",
+    "value": 201.0
+  },
+  {
+    "province": "สมุทรสาคร",
+    "district": "บ้านแพ้ว",
+    "value": 107.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "เมืองแม่ฮ่องสอน",
+    "value": 92.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "แม่ลาน้อย",
+    "value": 15.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "แม่สะเรียง",
+    "value": 34.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "ขุนยวม",
+    "value": 40.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "ปางมะผ้า",
+    "value": 31.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "ปาย",
+    "value": 37.0
+  },
+  {
+    "province": "แม่ฮ่องสอน",
+    "district": "สบเมย",
+    "value": 9.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "เฝ้าไร่",
+    "value": 52.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "เมืองหนองคาย",
+    "value": 80.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "โพธิ์ตาก",
+    "value": 32.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "โพนพิสัย",
+    "value": 86.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "ท่าบ่อ",
+    "value": 76.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "รัตนวาปี",
+    "value": 38.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "ศรีเชียงใหม่",
+    "value": 24.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "สระใคร",
+    "value": 34.0
+  },
+  {
+    "province": "หนองคาย",
+    "district": "สังคม",
+    "value": 21.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "เซกา",
+    "value": 49.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "เมืองบึงกาฬ",
+    "value": 58.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "โซ่พิสัย",
+    "value": 40.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "บึงโขงหลง",
+    "value": 42.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "บุ่งคล้า",
+    "value": 22.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "ปากคาด",
+    "value": 46.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "พรเจริญ",
+    "value": 50.0
+  },
+  {
+    "province": "บึงกาฬ",
+    "district": "ศรีวิไล",
+    "value": 47.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "เกาะลันตา",
+    "value": 54.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "เขาพนม",
+    "value": 34.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "เมืองกระบี่",
+    "value": 93.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "เหนือคลอง",
+    "value": 65.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "คลองท่อม",
+    "value": 48.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "ปลายพระยา",
+    "value": 26.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "ลำทับ",
+    "value": 42.0
+  },
+  {
+    "province": "กระบี่",
+    "district": "อ่าวลึก",
+    "value": 43.0
+  },
+  {
+    "province": "แพร่",
+    "district": "เด่นชัย",
+    "value": 30.0
+  },
+  {
+    "province": "แพร่",
+    "district": "เมืองแพร่",
+    "value": 68.0
+  },
+  {
+    "province": "แพร่",
+    "district": "ร้องกวาง",
+    "value": 53.0
+  },
+  {
+    "province": "แพร่",
+    "district": "ลอง",
+    "value": 15.0
+  },
+  {
+    "province": "แพร่",
+    "district": "วังชิ้น",
+    "value": 29.0
+  },
+  {
+    "province": "แพร่",
+    "district": "สอง",
+    "value": 38.0
+  },
+  {
+    "province": "แพร่",
+    "district": "สูงเม่น",
+    "value": 66.0
+  },
+  {
+    "province": "แพร่",
+    "district": "หนองม่วงไข่",
+    "value": 58.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "เขวาสินรินทร์",
+    "value": 52.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "เมืองสุรินทร์",
+    "value": 144.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "โนนนารายณ์",
+    "value": 35.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "กาบเชิง",
+    "value": 69.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "จอมพระ",
+    "value": 71.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ชุมพลบุรี",
+    "value": 100.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ท่าตูม",
+    "value": 86.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "บัวเชด",
+    "value": 57.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ปราสาท",
+    "value": 57.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "พนมดงรัก",
+    "value": 64.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "รัตนบุรี",
+    "value": 69.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ลำดวน",
+    "value": 40.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ศรีณรงค์",
+    "value": 31.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "ศีขรภูมิ",
+    "value": 49.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "สนม",
+    "value": 56.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "สังขะ",
+    "value": 90.0
+  },
+  {
+    "province": "สุรินทร์",
+    "district": "สำโรงทาบ",
+    "value": 45.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "เมืองหนองบัวลำภู",
+    "value": 108.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "โนนสัง",
+    "value": 63.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "นากลาง",
+    "value": 78.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "นาวัง",
+    "value": 11.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "ศรีบุญเรือง",
+    "value": 80.0
+  },
+  {
+    "province": "หนองบัวลำภู",
+    "district": "สุวรรณคูหา",
+    "value": 58.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "เมืองสิงห์บุรี",
+    "value": 24.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "ค่ายบางระจัน",
+    "value": 17.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "ท่าช้าง",
+    "value": 27.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "บางระจัน",
+    "value": 41.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "พรหมบุรี",
+    "value": 16.0
+  },
+  {
+    "province": "สิงห์บุรี",
+    "district": "อินทร์บุรี",
+    "value": 32.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "เชียงคำ",
+    "value": 49.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "เชียงม่วน",
+    "value": 45.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "เมืองพะเยา",
+    "value": 38.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "แม่ใจ",
+    "value": 7.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "จุน",
+    "value": 27.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "ดอกคำใต้",
+    "value": 59.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "ปง",
+    "value": 41.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "ภูกามยาว",
+    "value": 51.0
+  },
+  {
+    "province": "พะเยา",
+    "district": "ภูซาง",
+    "value": 23.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "เมืองสุโขทัย",
+    "value": 39.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "กงไกรลาศ",
+    "value": 28.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "คีรีมาศ",
+    "value": 8.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "ทุ่งเสลี่ยม",
+    "value": 37.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "บ้านด่านลานหอย",
+    "value": 19.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "ศรีนคร",
+    "value": 57.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "ศรีสัชนาลัย",
+    "value": 75.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "ศรีสำโรง",
+    "value": 43.0
+  },
+  {
+    "province": "สุโขทัย",
+    "district": "สวรรคโลก",
+    "value": 121.0
+  },
+  {
+    "province": "ภูเก็ต",
+    "district": "เมืองภูเก็ต",
+    "value": 148.0
+  },
+  {
+    "province": "ภูเก็ต",
+    "district": "กะทู้",
+    "value": 88.0
+  },
+  {
+    "province": "ภูเก็ต",
+    "district": "ถลาง",
+    "value": 71.0
+  },
+  {
+    "province": "ตราด",
+    "district": "เกาะกูด",
+    "value": 13.0
+  },
+  {
+    "province": "ตราด",
+    "district": "เกาะช้าง",
+    "value": 35.0
+  },
+  {
+    "province": "ตราด",
+    "district": "เขาสมิง",
+    "value": 33.0
+  },
+  {
+    "province": "ตราด",
+    "district": "เมืองตราด",
+    "value": 31.0
+  },
+  {
+    "province": "ตราด",
+    "district": "แหลมงอบ",
+    "value": 32.0
+  },
+  {
+    "province": "ตราด",
+    "district": "คลองใหญ่",
+    "value": 5.0
+  },
+  {
+    "province": "ตราด",
+    "district": "บ่อไร่",
+    "value": 12.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "เมืองฉะเชิงเทรา",
+    "value": 149.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "แปลงยาว",
+    "value": 20.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "คลองเขื่อน",
+    "value": 48.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "ท่าตะเกียบ",
+    "value": 22.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "บางคล้า",
+    "value": 89.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "บางน้ำเปรี้ยว",
+    "value": 32.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "บางปะกง",
+    "value": 42.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "บ้านโพธิ์",
+    "value": 32.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "พนมสารคาม",
+    "value": 31.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "ราชสาส์น",
+    "value": 17.0
+  },
+  {
+    "province": "ฉะเชิงเทรา",
+    "district": "สนามชัยเขต",
+    "value": 25.0
+  },
+  {
+    "province": "สมุทรสงคราม",
+    "district": "เมืองสมุทรสงคราม",
+    "value": 66.0
+  },
+  {
+    "province": "สมุทรสงคราม",
+    "district": "บางคนที",
+    "value": 31.0
+  },
+  {
+    "province": "สมุทรสงคราม",
+    "district": "อัมพวา",
+    "value": 31.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "เมืองชุมพร",
+    "value": 110.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "ท่าแซะ",
+    "value": 58.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "ทุ่งตะโก",
+    "value": 15.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "ปะทิว",
+    "value": 32.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "พะโต๊ะ",
+    "value": 32.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "ละแม",
+    "value": 20.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "สวี",
+    "value": 12.0
+  },
+  {
+    "province": "ชุมพร",
+    "district": "หลังสวน",
+    "value": 54.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "เชียงยืน",
+    "value": 26.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "เมืองมหาสารคาม",
+    "value": 184.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "แกดำ",
+    "value": 41.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "โกสุมพิสัย",
+    "value": 22.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "กันทรวิชัย",
+    "value": 48.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "กุดรัง",
+    "value": 23.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "ชื่นชม",
+    "value": 11.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "นาเชือก",
+    "value": 51.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "นาดูน",
+    "value": 20.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "บรบือ",
+    "value": 37.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "พยัคฆภูมิพิสัย",
+    "value": 55.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "ยางสีสุราช",
+    "value": 30.0
+  },
+  {
+    "province": "มหาสารคาม",
+    "district": "วาปีปทุม",
+    "value": 45.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "เฉลิมพระเกียรติ",
+    "value": 15.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "เมืองสระบุรี",
+    "value": 88.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "เสาไห้",
+    "value": 12.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "แก่งคอย",
+    "value": 101.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "ดอนพุด",
+    "value": 2.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "บ้านหมอ",
+    "value": 24.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "พระพุทธบาท",
+    "value": 24.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "มวกเหล็ก",
+    "value": 28.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "วังม่วง",
+    "value": 6.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "วิหารแดง",
+    "value": 24.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "หนองแค",
+    "value": 54.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "หนองแซง",
+    "value": 19.0
+  },
+  {
+    "province": "สระบุรี",
+    "district": "หนองโดน",
+    "value": 6.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "เกาะคา",
+    "value": 59.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "เถิน",
+    "value": 22.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "เมืองปาน",
+    "value": 11.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "เมืองลำปาง",
+    "value": 128.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "เสริมงาม",
+    "value": 13.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "แจ้ห่ม",
+    "value": 13.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "แม่เมาะ",
+    "value": 55.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "แม่ทะ",
+    "value": 26.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "แม่พริก",
+    "value": 19.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "งาว",
+    "value": 47.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "วังเหนือ",
+    "value": 18.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "สบปราบ",
+    "value": 6.0
+  },
+  {
+    "province": "ลำปาง",
+    "district": "ห้างฉัตร",
+    "value": 26.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เชียงแสน",
+    "value": 34.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เชียงของ",
+    "value": 60.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เทิง",
+    "value": 62.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เมืองเชียงราย",
+    "value": 60.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เวียงเชียงรุ้ง",
+    "value": 56.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เวียงแก่น",
+    "value": 35.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เวียงชัย",
+    "value": 37.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "เวียงป่าเป้า",
+    "value": 31.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "แม่จัน",
+    "value": 20.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "แม่ฟ้าหลวง",
+    "value": 6.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "แม่ลาว",
+    "value": 44.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "แม่สรวย",
+    "value": 64.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "แม่สาย",
+    "value": 28.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "ขุนตาล",
+    "value": 62.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "ดอยหลวง",
+    "value": 29.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "ป่าแดด",
+    "value": 60.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "พญาเม็งราย",
+    "value": 38.0
+  },
+  {
+    "province": "เชียงราย",
+    "district": "พาน",
+    "value": 76.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "เมืองสมุทรปราการ",
+    "value": 234.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "บางเสาธง",
+    "value": 74.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "บางบ่อ",
+    "value": 114.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "บางพลี",
+    "value": 251.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "พระประแดง",
+    "value": 107.0
+  },
+  {
+    "province": "สมุทรปราการ",
+    "district": "พระสมุทรเจดีย์",
+    "value": 35.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "เจาะไอร้อง",
+    "value": 56.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "เมืองนราธิวาส",
+    "value": 86.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "แว้ง",
+    "value": 30.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "จะแนะ",
+    "value": 19.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "ตากใบ",
+    "value": 27.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "บาเจาะ",
+    "value": 56.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "ยี่งอ",
+    "value": 19.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "ระแงะ",
+    "value": 19.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "รือเสาะ",
+    "value": 26.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "ศรีสาคร",
+    "value": 11.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "สุไหงโกลก",
+    "value": 42.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "สุไหงปาดี",
+    "value": 75.0
+  },
+  {
+    "province": "นราธิวาส",
+    "district": "สุคิริน",
+    "value": 20.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "เมืองตรัง",
+    "value": 82.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "กันตัง",
+    "value": 29.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "นาโยง",
+    "value": 8.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "ปะเหลียน",
+    "value": 16.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "ย่านตาขาว",
+    "value": 20.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "รัษฎา",
+    "value": 64.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "วังวิเศษ",
+    "value": 37.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "สิเกา",
+    "value": 15.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "ห้วยยอด",
+    "value": 72.0
+  },
+  {
+    "province": "ตรัง",
+    "district": "หาดสำราญ",
+    "value": 25.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เกษตรวิสัย",
+    "value": 33.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เชียงขวัญ",
+    "value": 41.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เมยวดี",
+    "value": 46.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เมืองร้อยเอ็ด",
+    "value": 111.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เมืองสรวง",
+    "value": 12.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "เสลภูมิ",
+    "value": 36.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "โพธิ์ชัย",
+    "value": 12.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "โพนทราย",
+    "value": 18.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "โพนทอง",
+    "value": 36.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "จตุรพักตรพิมาน",
+    "value": 35.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "จังหาร",
+    "value": 29.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "ทุ่งเขาหลวง",
+    "value": 12.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "ธวัชบุรี",
+    "value": 40.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "ปทุมรัตต์",
+    "value": 45.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "พนมไพร",
+    "value": 22.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "ศรีสมเด็จ",
+    "value": 31.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "สุวรรณภูมิ",
+    "value": 42.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "หนองพอก",
+    "value": 27.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "หนองฮี",
+    "value": 31.0
+  },
+  {
+    "province": "ร้อยเอ็ด",
+    "district": "อาจสามารถ",
+    "value": 41.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "เมืองปัตตานี",
+    "value": 76.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "แม่ลาน",
+    "value": 11.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "โคกโพธิ์",
+    "value": 19.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "ไม้แก่น",
+    "value": 21.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "กะพ้อ",
+    "value": 21.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "ทุ่งยางแดง",
+    "value": 15.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "ปะนาเระ",
+    "value": 34.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "มายอ",
+    "value": 44.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "ยะรัง",
+    "value": 61.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "ยะหริ่ง",
+    "value": 19.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "สายบุรี",
+    "value": 47.0
+  },
+  {
+    "province": "ปัตตานี",
+    "district": "หนองจิก",
+    "value": 7.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "เจริญศิลป์",
+    "value": 26.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "เต่างอย",
+    "value": 26.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "เมืองสกลนคร",
+    "value": 134.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "โคกศรีสุพรรณ",
+    "value": 17.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "โพนนาแก้ว",
+    "value": 12.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "กุดบาก",
+    "value": 25.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "กุสุมาลย์",
+    "value": 10.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "คำตากล้า",
+    "value": 16.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "นิคมน้ำอูน",
+    "value": 13.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "บ้านม่วง",
+    "value": 3.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "พรรณานิคม",
+    "value": 18.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "พังโคน",
+    "value": 50.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "ภูพาน",
+    "value": 18.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "วานรนิวาส",
+    "value": 34.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "วาริชภูมิ",
+    "value": 48.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "สว่างแดนดิน",
+    "value": 43.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "ส่องดาว",
+    "value": 17.0
+  },
+  {
+    "province": "สกลนคร",
+    "district": "อากาศอำนวย",
+    "value": 42.0
+  },
+  {
+    "province": "พังงา",
+    "district": "เกาะยาว",
+    "value": 7.0
+  },
+  {
+    "province": "พังงา",
+    "district": "เมืองพังงา",
+    "value": 47.0
+  },
+  {
+    "province": "พังงา",
+    "district": "กะปง",
+    "value": 3.0
+  },
+  {
+    "province": "พังงา",
+    "district": "คุระบุรี",
+    "value": 5.0
+  },
+  {
+    "province": "พังงา",
+    "district": "ตะกั่วทุ่ง",
+    "value": 26.0
+  },
+  {
+    "province": "พังงา",
+    "district": "ตะกั่วป่า",
+    "value": 26.0
+  },
+  {
+    "province": "พังงา",
+    "district": "ทับปุด",
+    "value": 6.0
+  },
+  {
+    "province": "พังงา",
+    "district": "ท้ายเหมือง",
+    "value": 9.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "เมืองนนทบุรี",
+    "value": 173.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "ไทรน้อย",
+    "value": 20.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "บางใหญ่",
+    "value": 61.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "บางกรวย",
+    "value": 96.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "บางบัวทอง",
+    "value": 76.0
+  },
+  {
+    "province": "นนทบุรี",
+    "district": "ปากเกร็ด",
+    "value": 182.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "คลองเตย",
+    "value": 77.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "คลองสาน",
+    "value": 49.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "คลองสามวา",
+    "value": 54.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "คันนายาว",
+    "value": 35.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "จตุจักร",
+    "value": 96.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "จอมทอง",
+    "value": 20.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ดอนเมือง",
+    "value": 53.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ดินแดง",
+    "value": 50.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ดุสิต",
+    "value": 38.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ตลิ่งชัน",
+    "value": 43.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ทวีวัฒนา",
+    "value": 47.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ทุ่งครุ",
+    "value": 46.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ธนบุรี",
+    "value": 22.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางเขน",
+    "value": 98.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางแค",
+    "value": 49.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางกอกใหญ่",
+    "value": 36.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางกอกน้อย",
+    "value": 42.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางกะปิ",
+    "value": 99.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางขุนเทียน",
+    "value": 43.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางคอแหลม",
+    "value": 30.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางซื่อ",
+    "value": 41.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางนา",
+    "value": 35.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางบอน",
+    "value": 25.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางพลัด",
+    "value": 47.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บางรัก",
+    "value": 33.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "บึงกุ่ม",
+    "value": 69.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ปทุมวัน",
+    "value": 51.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ประเวศ",
+    "value": 67.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ป้อมปราบศัตรูพ่าย",
+    "value": 25.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "พญาไท",
+    "value": 66.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "พระโขนง",
+    "value": 37.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "พระนคร",
+    "value": 45.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ภาษีเจริญ",
+    "value": 46.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "มีนบุรี",
+    "value": 33.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ยานนาวา",
+    "value": 52.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ราชเทวี",
+    "value": 36.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ราษฎร์บูรณะ",
+    "value": 22.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ลาดกระบัง",
+    "value": 54.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ลาดพร้าว",
+    "value": 65.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "วังทองหลาง",
+    "value": 67.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "วัฒนา",
+    "value": 64.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "สวนหลวง",
+    "value": 61.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "สะพานสูง",
+    "value": 62.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "สัมพันธวงศ์",
+    "value": 10.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "สาทร",
+    "value": 37.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "สายไหม",
+    "value": 73.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "หนองแขม",
+    "value": 33.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "หนองจอก",
+    "value": 32.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "หลักสี่",
+    "value": 66.0
+  },
+  {
+    "province": "กรุงเทพมหานคร",
+    "district": "ห้วยขวาง",
+    "value": 58.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "เมืองประจวบคีรีขันธ์",
+    "value": 48.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "กุยบุรี",
+    "value": 18.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "ทับสะแก",
+    "value": 57.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "บางสะพาน",
+    "value": 10.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "บางสะพานน้อย",
+    "value": 26.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "ปราณบุรี",
+    "value": 41.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "สามร้อยยอด",
+    "value": 14.0
+  },
+  {
+    "province": "ประจวบคีรีขันธ์",
+    "district": "หัวหิน",
+    "value": 27.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "เมืองปทุมธานี",
+    "value": 95.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "คลองหลวง",
+    "value": 176.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "ธัญบุรี",
+    "value": 99.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "ลาดหลุมแก้ว",
+    "value": 19.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "ลำลูกกา",
+    "value": 104.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "สามโคก",
+    "value": 20.0
+  },
+  {
+    "province": "ปทุมธานี",
+    "district": "หนองเสือ",
+    "value": 20.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "เขาค้อ",
+    "value": 38.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "เมืองเพชรบูรณ์",
+    "value": 75.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "ชนแดน",
+    "value": 61.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "น้ำหนาว",
+    "value": 24.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "บึงสามพัน",
+    "value": 32.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "วังโป่ง",
+    "value": 29.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "วิเชียรบุรี",
+    "value": 9.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "ศรีเทพ",
+    "value": 7.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "หนองไผ่",
+    "value": 60.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "หล่มเก่า",
+    "value": 20.0
+  },
+  {
+    "province": "เพชรบูรณ์",
+    "district": "หล่มสัก",
+    "value": 66.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "เนินมะปราง",
+    "value": 17.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "เมืองพิษณุโลก",
+    "value": 124.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "ชาติตระการ",
+    "value": 18.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "นครไทย",
+    "value": 33.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "บางกระทุ่ม",
+    "value": 14.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "บางระกำ",
+    "value": 37.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "พรหมพิราม",
+    "value": 44.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "วังทอง",
+    "value": 50.0
+  },
+  {
+    "province": "พิษณุโลก",
+    "district": "วัดโบสถ์",
+    "value": 27.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "เก้าเลี้ยว",
+    "value": 19.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "เมืองนครสวรรค์",
+    "value": 147.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "แม่เปิน",
+    "value": 8.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "แม่วงก์",
+    "value": 20.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "โกรกพระ",
+    "value": 38.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ไพศาลี",
+    "value": 14.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ชุมแสง",
+    "value": 33.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ชุมตาบง",
+    "value": 3.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ตากฟ้า",
+    "value": 5.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ตาคลี",
+    "value": 9.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ท่าตะโก",
+    "value": 26.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "บรรพตพิสัย",
+    "value": 21.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "พยุหะคีรี",
+    "value": 31.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "ลาดยาว",
+    "value": 38.0
+  },
+  {
+    "province": "นครสวรรค์",
+    "district": "หนองบัว",
+    "value": 17.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "เกาะพะงัน",
+    "value": 28.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "เกาะสมุย",
+    "value": 37.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "เคียนซา",
+    "value": 9.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "เมืองสุราษฎร์ธานี",
+    "value": 71.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "เวียงสระ",
+    "value": 7.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "ไชยา",
+    "value": 34.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "กาญจนดิษฐ์",
+    "value": 19.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "คีรีรัฐนิคม",
+    "value": 9.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "ชัยบุรี",
+    "value": 3.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "ดอนสัก",
+    "value": 14.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "ท่าฉาง",
+    "value": 45.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "ท่าชนะ",
+    "value": 28.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "บ้านตาขุน",
+    "value": 7.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "บ้านนาเดิม",
+    "value": 6.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "บ้านนาสาร",
+    "value": 23.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "พนม",
+    "value": 5.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "พระแสง",
+    "value": 11.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "พุนพิน",
+    "value": 28.0
+  },
+  {
+    "province": "สุราษฎร์ธานี",
+    "district": "วิภาวดี",
+    "value": 29.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "เมืองนครปฐม",
+    "value": 117.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "กำแพงแสน",
+    "value": 33.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "ดอนตูม",
+    "value": 33.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "นครชัยศรี",
+    "value": 35.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "บางเลน",
+    "value": 16.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "พุทธมณฑล",
+    "value": 31.0
+  },
+  {
+    "province": "นครปฐม",
+    "district": "สามพราน",
+    "value": 87.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "เขาสวนกวาง",
+    "value": 13.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "เปือยน้อย",
+    "value": 18.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "เมืองขอนแก่น",
+    "value": 198.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "เวียงเก่า",
+    "value": 11.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "แวงใหญ่",
+    "value": 7.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "แวงน้อย",
+    "value": 8.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "โคกโพธิ์ไชย",
+    "value": 5.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "โนนศิลา",
+    "value": 8.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "กระนวน",
+    "value": 50.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "ชนบท",
+    "value": 25.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "ชุมแพ",
+    "value": 27.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "ซำสูง",
+    "value": 3.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "น้ำพอง",
+    "value": 37.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "บ้านแฮด",
+    "value": 8.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "บ้านไผ่",
+    "value": 67.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "บ้านฝาง",
+    "value": 9.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "พระยืน",
+    "value": 8.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "พล",
+    "value": 22.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "ภูเวียง",
+    "value": 19.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "ภูผาม่าน",
+    "value": 6.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "มัญจาคีรี",
+    "value": 14.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "สีชมพู",
+    "value": 8.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "หนองเรือ",
+    "value": 21.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "หนองนาคำ",
+    "value": 15.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "หนองสองห้อง",
+    "value": 24.0
+  },
+  {
+    "province": "ขอนแก่น",
+    "district": "อุบลรัตน์",
+    "value": 26.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "เขาคิชฌกูฏ",
+    "value": 2.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "เมืองจันทบุรี",
+    "value": 64.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "แก่งหางแมว",
+    "value": 18.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "แหลมสิงห์",
+    "value": 17.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "โป่งน้ำร้อน",
+    "value": 7.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "ขลุง",
+    "value": 23.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "ท่าใหม่",
+    "value": 23.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "นายายอาม",
+    "value": 17.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "มะขาม",
+    "value": 11.0
+  },
+  {
+    "province": "จันทบุรี",
+    "district": "สอยดาว",
+    "value": 8.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "เขาชะเมา",
+    "value": 6.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "เมืองระยอง",
+    "value": 108.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "แกลง",
+    "value": 38.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "นิคมพัฒนา",
+    "value": 10.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "บ้านค่าย",
+    "value": 18.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "บ้านฉาง",
+    "value": 24.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "ปลวกแดง",
+    "value": 48.0
+  },
+  {
+    "province": "ระยอง",
+    "district": "วังจันทร์",
+    "value": 5.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "เมืองอุตรดิตถ์",
+    "value": 61.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "ตรอน",
+    "value": 5.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "ทองแสนขัน",
+    "value": 8.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "ท่าปลา",
+    "value": 14.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "น้ำปาด",
+    "value": 10.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "บ้านโคก",
+    "value": 8.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "พิชัย",
+    "value": 12.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "ฟากท่า",
+    "value": 9.0
+  },
+  {
+    "province": "อุตรดิตถ์",
+    "district": "ลับแล",
+    "value": 16.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "เกษตรสมบูรณ์",
+    "value": 18.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "เทพสถิต",
+    "value": 12.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "เนินสง่า",
+    "value": 10.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "เมืองชัยภูมิ",
+    "value": 62.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "แก้งคร้อ",
+    "value": 5.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "คอนสวรรค์",
+    "value": 17.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "คอนสาร",
+    "value": 16.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "จัตุรัส",
+    "value": 79.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "ซับใหญ่",
+    "value": 16.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "บ้านเขว้า",
+    "value": 16.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "บ้านแท่น",
+    "value": 11.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "บำเหน็จณรงค์",
+    "value": 19.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "ภักดีชุมพล",
+    "value": 17.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "ภูเขียว",
+    "value": 20.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "หนองบัวแดง",
+    "value": 18.0
+  },
+  {
+    "province": "ชัยภูมิ",
+    "district": "หนองบัวระเหว",
+    "value": 26.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "เดิมบางนางบวช",
+    "value": 25.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "เมืองสุพรรณบุรี",
+    "value": 31.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "ดอนเจดีย์",
+    "value": 21.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "ด่านช้าง",
+    "value": 22.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "บางปลาม้า",
+    "value": 35.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "ศรีประจันต์",
+    "value": 31.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "สองพี่น้อง",
+    "value": 17.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "สามชุก",
+    "value": 23.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "หนองหญ้าไซ",
+    "value": 31.0
+  },
+  {
+    "province": "สุพรรณบุรี",
+    "district": "อู่ทอง",
+    "value": 26.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "เกาะจันทร์",
+    "value": 9.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "เกาะสีชัง",
+    "value": 10.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "เมืองชลบุรี",
+    "value": 97.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "บ่อทอง",
+    "value": 30.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "บางละมุง",
+    "value": 73.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "บ้านบึง",
+    "value": 37.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "พนัสนิคม",
+    "value": 31.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "พานทอง",
+    "value": 37.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "ศรีราชา",
+    "value": 96.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "สัตหีบ",
+    "value": 39.0
+  },
+  {
+    "province": "ชลบุรี",
+    "district": "หนองใหญ่",
+    "value": 12.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "เบตง",
+    "value": 37.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "เมืองยะลา",
+    "value": 64.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "กรงปินัง",
+    "value": 4.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "กาบัง",
+    "value": 11.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "ธารโต",
+    "value": 5.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "บันนังสตา",
+    "value": 14.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "ยะหา",
+    "value": 9.0
+  },
+  {
+    "province": "ยะลา",
+    "district": "รามัน",
+    "value": 16.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "เมืองกาญจนบุรี",
+    "value": 51.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "เลาขวัญ",
+    "value": 5.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ไทรโยค",
+    "value": 16.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ด่านมะขามเตี้ย",
+    "value": 10.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ทองผาภูมิ",
+    "value": 8.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ท่าม่วง",
+    "value": 46.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ท่ามะกา",
+    "value": 37.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "บ่อพลอย",
+    "value": 16.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "พนมทวน",
+    "value": 17.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ศรีสวัสดิ์",
+    "value": 6.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "สังขละบุรี",
+    "value": 6.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "หนองปรือ",
+    "value": 17.0
+  },
+  {
+    "province": "กาญจนบุรี",
+    "district": "ห้วยกระเจา",
+    "value": 13.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "เขาฉกรรจ์",
+    "value": 11.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "เมืองสระแก้ว",
+    "value": 39.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "โคกสูง",
+    "value": 7.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "คลองหาด",
+    "value": 10.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "ตาพระยา",
+    "value": 13.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "วังน้ำเย็น",
+    "value": 12.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "วังสมบูรณ์",
+    "value": 5.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "วัฒนานคร",
+    "value": 24.0
+  },
+  {
+    "province": "สระแก้ว",
+    "district": "อรัญประเทศ",
+    "value": 29.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "เขมราฐ",
+    "value": 16.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "เขื่องใน",
+    "value": 15.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "เดชอุดม",
+    "value": 54.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "เมืองอุบลราชธานี",
+    "value": 80.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "เหล่าเสือโก้ก",
+    "value": 17.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "โขงเจียม",
+    "value": 7.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "โพธิ์ไทร",
+    "value": 7.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "กุดข้าวปุ้น",
+    "value": 9.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ดอนมดแดง",
+    "value": 17.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ตระการพืชผล",
+    "value": 11.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ตาลสุม",
+    "value": 15.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ทุ่งศรีอุดม",
+    "value": 15.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "นาเยีย",
+    "value": 15.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "นาจะหลวย",
+    "value": 10.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "นาตาล",
+    "value": 6.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "น้ำขุ่น",
+    "value": 11.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "น้ำยืน",
+    "value": 18.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "บุณฑริก",
+    "value": 9.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "พิบูลมังสาหาร",
+    "value": 17.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ม่วงสามสิบ",
+    "value": 14.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "วารินชำราบ",
+    "value": 35.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "ศรีเมืองใหม่",
+    "value": 18.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "สว่างวีระวงศ์",
+    "value": 9.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "สำโรง",
+    "value": 36.0
+  },
+  {
+    "province": "อุบลราชธานี",
+    "district": "สิรินธร",
+    "value": 16.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "เขาวง",
+    "value": 11.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "เมืองกาฬสินธุ์",
+    "value": 22.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "กมลาไสย",
+    "value": 20.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "กุฉินารายณ์",
+    "value": 13.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "คำม่วง",
+    "value": 3.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ฆ้องชัย",
+    "value": 12.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ดอนจาน",
+    "value": 6.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ท่าคันโท",
+    "value": 19.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "นาคู",
+    "value": 8.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "นามน",
+    "value": 6.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ยางตลาด",
+    "value": 25.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ร่องคำ",
+    "value": 10.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "สมเด็จ",
+    "value": 10.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "สหัสขันธ์",
+    "value": 14.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "สามชัย",
+    "value": 1.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "หนองกุงศรี",
+    "value": 27.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ห้วยเม็ก",
+    "value": 4.0
+  },
+  {
+    "province": "กาฬสินธุ์",
+    "district": "ห้วยผึ้ง",
+    "value": 10.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "เมืองกำแพงเพชร",
+    "value": 38.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "โกสัมพีนคร",
+    "value": 8.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "ไทรงาม",
+    "value": 9.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "ขาณุวรลักษบุรี",
+    "value": 21.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "คลองขลุง",
+    "value": 22.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "คลองลาน",
+    "value": 13.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "ทรายทองวัฒนา",
+    "value": 19.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "บึงสามัคคี",
+    "value": 13.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "ปางศิลาทอง",
+    "value": 3.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "พรานกระต่าย",
+    "value": 11.0
+  },
+  {
+    "province": "กำแพงเพชร",
+    "district": "ลานกระบือ",
+    "value": 2.0
+  },
+  {
+    "province": "น่าน",
+    "district": "เฉลิมพระเกียรติ",
+    "value": 0.0
+  },
+  {
+    "province": "น่าน",
+    "district": "เชียงกลาง",
+    "value": 1.0
+  },
+  {
+    "province": "น่าน",
+    "district": "เมืองน่าน",
+    "value": 34.0
+  },
+  {
+    "province": "น่าน",
+    "district": "เวียงสา",
+    "value": 9.0
+  },
+  {
+    "province": "น่าน",
+    "district": "แม่จริม",
+    "value": 1.0
+  },
+  {
+    "province": "น่าน",
+    "district": "ท่าวังผา",
+    "value": 3.0
+  },
+  {
+    "province": "น่าน",
+    "district": "ทุ่งช้าง",
+    "value": 7.0
+  },
+  {
+    "province": "น่าน",
+    "district": "นาน้อย",
+    "value": 1.0
+  },
+  {
+    "province": "น่าน",
+    "district": "นาหมื่น",
+    "value": 3.0
+  },
+  {
+    "province": "น่าน",
+    "district": "บ่อเกลือ",
+    "value": 3.0
+  },
+  {
+    "province": "น่าน",
+    "district": "บ้านหลวง",
+    "value": 4.0
+  },
+  {
+    "province": "น่าน",
+    "district": "ปัว",
+    "value": 19.0
+  },
+  {
+    "province": "น่าน",
+    "district": "ภูเพียง",
+    "value": 6.0
+  },
+  {
+    "province": "น่าน",
+    "district": "สองแคว",
+    "value": 3.0
+  },
+  {
+    "province": "น่าน",
+    "district": "สันติสุข",
+    "value": 3.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "เมืองนครพนม",
+    "value": 58.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "เรณูนคร",
+    "value": 9.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "โพนสวรรค์",
+    "value": 9.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "ท่าอุเทน",
+    "value": 3.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "ธาตุพนม",
+    "value": 10.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "นาแก",
+    "value": 26.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "นาทม",
+    "value": 5.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "นาหว้า",
+    "value": 4.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "บ้านแพง",
+    "value": 7.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "ปลาปาก",
+    "value": 3.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "วังยาง",
+    "value": 3.0
+  },
+  {
+    "province": "นครพนม",
+    "district": "ศรีสงคราม",
+    "value": 6.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "เฉลิมพระเกียรติ",
+    "value": 8.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "เทพารักษ์",
+    "value": 3.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "เมืองนครราชสีมา",
+    "value": 135.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "เมืองยาง",
+    "value": 1.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "เสิงสาง",
+    "value": 6.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "แก้งสนามนาง",
+    "value": 3.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "โชคชัย",
+    "value": 10.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "โนนแดง",
+    "value": 5.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "โนนไทย",
+    "value": 8.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "โนนสูง",
+    "value": 10.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ขามทะเลสอ",
+    "value": 15.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ขามสะแกแสง",
+    "value": 2.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "คง",
+    "value": 9.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ครบุรี",
+    "value": 13.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "จักราช",
+    "value": 11.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ชุมพวง",
+    "value": 3.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ด่านขุนทด",
+    "value": 10.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "บัวใหญ่",
+    "value": 9.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "บัวลาย",
+    "value": 8.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "บ้านเหลื่อม",
+    "value": 5.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ประทาย",
+    "value": 8.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ปักธงชัย",
+    "value": 20.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ปากช่อง",
+    "value": 35.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "พระทองคำ",
+    "value": 9.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "พิมาย",
+    "value": 19.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ลำทะเมนชัย",
+    "value": 4.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "วังน้ำเขียว",
+    "value": 12.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "สีคิ้ว",
+    "value": 15.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "สีดา",
+    "value": 5.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "สูงเนิน",
+    "value": 20.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "หนองบุญมาก",
+    "value": 14.0
+  },
+  {
+    "province": "นครราชสีมา",
+    "district": "ห้วยแถลง",
+    "value": 10.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "เพ็ญ",
+    "value": 13.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "เมืองอุดรธานี",
+    "value": 71.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "โนนสะอาด",
+    "value": 25.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "ไชยวาน",
+    "value": 2.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "กุดจับ",
+    "value": 11.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "กุมภวาปี",
+    "value": 18.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "กู่แก้ว",
+    "value": 3.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "ทุ่งฝน",
+    "value": 1.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "นายูง",
+    "value": 5.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "น้ำโสม",
+    "value": 10.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "บ้านดุง",
+    "value": 6.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "บ้านผือ",
+    "value": 9.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "ประจักษ์ศิลปาคม",
+    "value": 11.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "พิบูลย์รักษ์",
+    "value": 5.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "วังสามหมอ",
+    "value": 9.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "ศรีธาตุ",
+    "value": 8.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "สร้างคอม",
+    "value": 0.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "หนองแสง",
+    "value": 11.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "หนองวัวซอ",
+    "value": 17.0
+  },
+  {
+    "province": "อุดรธานี",
+    "district": "หนองหาน",
+    "value": 17.0
+  },
+  {
+    "province": "ตาก",
+    "district": "เมืองตาก",
+    "value": 10.0
+  },
+  {
+    "province": "ตาก",
+    "district": "แม่ระมาด",
+    "value": 11.0
+  },
+  {
+    "province": "ตาก",
+    "district": "แม่สอด",
+    "value": 29.0
+  },
+  {
+    "province": "ตาก",
+    "district": "ท่าสองยาง",
+    "value": 12.0
+  },
+  {
+    "province": "ตาก",
+    "district": "บ้านตาก",
+    "value": 6.0
+  },
+  {
+    "province": "ตาก",
+    "district": "พบพระ",
+    "value": 9.0
+  },
+  {
+    "province": "ตาก",
+    "district": "วังเจ้า",
+    "value": 4.0
+  },
+  {
+    "province": "ตาก",
+    "district": "สามเงา",
+    "value": 7.0
+  },
+  {
+    "province": "ตาก",
+    "district": "อุ้มผาง",
+    "value": 2.0
+  },
+  {
+    "province": "nan",
+    "district": "ยอดกลุ่ม",
+    "value": 46205.0
+  },
+  {
+    "province": "nan",
+    "district": "สมัคร1ต่อประชากร",
+    "value": 800674.795779843
+  }
+];
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var TH_BOUNDS = L.latLngBounds([5.6, 97.4], [20.5, 105.7]);
+var map = L.map('map', {
+  worldCopyJump: false,
+  zoomControl: true,
+  minZoom: 5,
+  maxZoom: 11,
+  maxBounds: TH_BOUNDS.pad(0.05),
+  maxBoundsViscosity: 1.0
+}).fitBounds(TH_BOUNDS);
+
+function keyify(prov, amp) {
+  function norm(s) {
+    return (s || "").toString().trim()
+      .replace(/\s+/g, "")
+      .replace("กรุงเทพมหานครฯ","กรุงเทพมหานคร")
+      .replace("กทม.","กรุงเทพมหานคร")
+      .replace("กทม","กรุงเทพมหานคร");
+  }
+  return norm(prov) + "|" + norm(amp);
+}
+
+var VALUE_BY_KEY = Object.create(null);
+var values = [];
+(window.DATA || []).forEach(function(row){
+  var k = keyify(row.province, row.district);
+  VALUE_BY_KEY[k] = row.value;
+  if (typeof row.value === "number" && !isNaN(row.value)) values.push(row.value);
+});
+
+values.sort(function(a,b){return a-b;});
+function quantile(arr, q) {
+  if (arr.length === 0) return 0;
+  var pos = (arr.length - 1) * q;
+  var base = Math.floor(pos);
+  var rest = pos - base;
+  if (arr[base+1] !== undefined) {
+    return arr[base] + rest * (arr[base+1] - arr[base]);
+  } else {
+    return arr[base];
+  }
+}
+
+var breaks = values.length >= 5 ? [
+  quantile(values, 0.2),
+  quantile(values, 0.4),
+  quantile(values, 0.6),
+  quantile(values, 0.8)
+] : [0,0,0,0];
+
+function getColor(d) {
+  if (d == null || isNaN(d)) return '#f2f2f2';
+  return d > breaks[3] ? '#800026' :
+         d > breaks[2] ? '#BD0026' :
+         d > breaks[1] ? '#E31A1C' :
+         d > breaks[0] ? '#FC4E2A' :
+                         '#FD8D3C';
+}
+
+var infoDiv = document.getElementById('info');
+function setInfo(props) {
+  if (!props) {
+    infoDiv.innerHTML = 'ไทย: แผนที่อำเภอ<br/>เลื่อนเมาส์เพื่อดูค่า (TOTAL)';
+  } else {
+    var k = keyify(props.pro_th, props.amp_th);
+    var v = VALUE_BY_KEY[k];
+    var vtext = (v==null || isNaN(v)) ? 'ไม่มีข้อมูล' : v.toLocaleString();
+    infoDiv.innerHTML = '<b>' + props.amp_th + '</b>, ' + props.pro_th + '<br/>TOTAL: <b>' + vtext + '</b>';
+  }
+}
+
+var legendDiv = document.getElementById('legend');
+(function renderLegend(){
+  var grades = [ -Infinity ].concat(breaks).concat([Infinity]);
+  var html = '';
+  for (var i=0; i<grades.length-1; i++) {
+    var from = grades[i];
+    var to = grades[i+1];
+    var sample = (isFinite(to) ? to : from + 1);
+    html += '<div class="row"><span class="swatch" style="background:'+getColor(sample)+'"></span>';
+    html += (isFinite(from) && from !== -Infinity ? from.toLocaleString() : '') + (isFinite(to) ? '–' + to.toLocaleString() : '+');
+    html += '</div>';
+  }
+  legendDiv.innerHTML = html;
+})();
+
+fetch("https://raw.githubusercontent.com/chingchai/OpenGISData-Thailand/master/districts.geojson")
+  .then(function(r) { return r.json(); })
+  .then(function(geo) {
+    function style(feature) {
+      var k = keyify(feature.properties.pro_th, feature.properties.amp_th);
+      var v = VALUE_BY_KEY[k];
+      return {
+        fillColor: getColor(v),
+        weight: 0.6,
+        opacity: 1,
+        color: '#666',
+        fillOpacity: 0.9
+      };
+    }
+    function highlight(e) {
+      var layer = e.target;
+      layer.setStyle({ weight:2, color:'#000', fillOpacity:0.95 });
+      setInfo(layer.feature.properties);
+      try { layer.bringToFront(); } catch(e){}
+    }
+    function reset(e) {
+      geojson.resetStyle(e.target);
+      setInfo();
+    }
+    function onEach(feature, layer) {
+      layer.on({ mouseover: highlight, mouseout: reset, click: function(e){
+        var p = feature.properties;
+        var k = keyify(p.pro_th, p.amp_th);
+        var v = VALUE_BY_KEY[k];
+        var vtext = (v==null || isNaN(v)) ? 'ไม่มีข้อมูล' : v.toLocaleString();
+        layer.bindPopup('<b>'+p.amp_th+'</b>, '+p.pro_th+'<br/>TOTAL: <b>'+vtext+'</b>').openPopup();
+      }});
+    }
+    window.geojson = L.geoJson(geo, {style: style, onEachFeature: onEach}).addTo(map);
+    try { map.fitBounds(window.geojson.getBounds(), {padding:[10,10]}); } catch(e){}
+  })
+  .catch(function(err){
+    alert('โหลดขอบเขตอำเภอไม่สำเร็จ');
+    console.error(err);
+  });
+</script>
+</body>
+</html>
